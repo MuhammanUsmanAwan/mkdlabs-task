@@ -32,8 +32,6 @@ const AdminLoginPage = () => {
     try {
       const response = await sdk.login(data.email, data.password, "admin");
       if (response) {
-        console.log("response onsubmit______________", response);
-        
         dispatch({
           type: "LOGIN",
           payload: response,

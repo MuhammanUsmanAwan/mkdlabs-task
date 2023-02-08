@@ -13,7 +13,6 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
-      console.log(action, "action______________");
       localStorage.setItem("token", action.payload.token);
       localStorage.setItem("user_id", JSON.stringify(action.payload.user_id));
       localStorage.setItem("role", action.payload.role);
@@ -55,10 +54,6 @@ const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     const user_id = JSON.parse(localStorage.getItem("user_id"));
     const role = localStorage.getItem("role");
-    console.log(
-      localStorage.getItem("role"),
-      "authenticated_____________________"
-    );
     state.isAuthenticated = localStorage.getItem("isAuthenticated");
     if (token && user_id && role) {
       dispatch({

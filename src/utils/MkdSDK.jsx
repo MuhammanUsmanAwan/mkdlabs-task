@@ -34,9 +34,6 @@ export default function MkdSDK() {
     const json = await result.json();
 
     if (result.status === 200) {
-      console.log("token________________________",json)
-      // localStorage.setItem("token", json?.token);
-      // localStorage.setItem("role", json?.role);
       return json;
     }
 
