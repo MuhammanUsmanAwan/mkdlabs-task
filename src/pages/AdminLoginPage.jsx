@@ -5,6 +5,7 @@ import * as yup from "yup";
 import MkdSDK from "../utils/MkdSDK";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../authContext";
+import { GlobalContext } from "../globalContext";
 
 const AdminLoginPage = () => {
   const schema = yup
@@ -15,6 +16,7 @@ const AdminLoginPage = () => {
     .required();
 
   const { dispatch } = React.useContext(AuthContext);
+  const GCOntext = React.useContext(GlobalContext);
   const navigate = useNavigate();
   const {
     register,
@@ -27,7 +29,28 @@ const AdminLoginPage = () => {
 
   const onSubmit = async (data) => {
     let sdk = new MkdSDK();
-    //TODO
+    try {
+      const response = await sdk.login(data.email, data.password, "admin");
+      if (response) {
+        console.log("response onsubmit______________", response);
+        
+        dispatch({
+          type: "LOGIN",
+          payload: response,
+        });
+        GCOntext.dispatch({
+          type: "SNACKBAR",
+          payload: {
+            globalMessage: "LogIn Succcessfull",
+          },
+        });
+        navigate("/admin/dashboard");
+      } else {
+        setError("email", "invalid", "Invalid email or password");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

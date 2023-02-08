@@ -12,9 +12,35 @@ export default function MkdSDK() {
   this.setTable = function (table) {
     this._table = table;
   };
-  
+
   this.login = async function (email, password, role) {
-    //TODO
+    const header = {
+      "Content-Type": "application/json",
+      "x-project": base64Encode,
+    };
+
+    const payload = {
+      email: email,
+      password: password,
+      role: role,
+    };
+
+    const result = await fetch(this._baseurl + "/v2/api/lambda/login", {
+      method: "post",
+      headers: header,
+      body: JSON.stringify(payload),
+    });
+
+    const json = await result.json();
+
+    if (result.status === 200) {
+      console.log("token________________________",json)
+      // localStorage.setItem("token", json?.token);
+      // localStorage.setItem("role", json?.role);
+      return json;
+    }
+
+    throw new Error(json.message);
   };
 
   this.getHeader = function () {
@@ -27,7 +53,7 @@ export default function MkdSDK() {
   this.baseUrl = function () {
     return this._baseurl;
   };
-  
+
   this.callRestAPI = async function (payload, method) {
     const header = {
       "Content-Type": "application/json",
@@ -38,7 +64,7 @@ export default function MkdSDK() {
     switch (method) {
       case "GET":
         const getResult = await fetch(
-          this._baseurl + `/v1/api/rest/${this._table}/GET`,
+          this._baseurl + `/v2/api/rest/${this._table}/GET`,
           {
             method: "post",
             headers: header,
@@ -55,7 +81,7 @@ export default function MkdSDK() {
           throw new Error(jsonGet.message);
         }
         return jsonGet;
-      
+
       case "PAGINATE":
         if (!payload.page) {
           payload.page = 1;
@@ -64,7 +90,7 @@ export default function MkdSDK() {
           payload.limit = 10;
         }
         const paginateResult = await fetch(
-          this._baseurl + `/v1/api/rest/${this._table}/${method}`,
+          this._baseurl + `/v2/api/rest/${this._table}/${method}`,
           {
             method: "post",
             headers: header,
@@ -84,10 +110,28 @@ export default function MkdSDK() {
       default:
         break;
     }
-  };  
+  };
 
   this.check = async function (role) {
-    //TODO
+    const header = {
+      "Content-Type": "application/json",
+      "x-project": base64Encode,
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    };
+
+    const result = await fetch(this._baseurl + "/v2/api/auth/check", {
+      method: "post",
+      headers: header,
+      body: JSON.stringify({ role: role }),
+    });
+
+    const json = await result.json();
+
+    if (result.status === 200) {
+      return json;
+    }
+
+    throw new Error(json.message);
   };
 
   return this;
